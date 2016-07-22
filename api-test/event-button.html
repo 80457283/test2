@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>EventUtil</title>
+</head>
+<body>
+       <span id="eventBtn1" style="width: 500px; height: 500px; background: #0000ed; display: block;">eventBtn1</span>
+
+
+       <script type="text/javascript">
+             var EventUtil = {
+                addHandler: function(element, type, handler) {
+                     if(element.addEventListener) {
+                         element.addEventListener(type, handler, false);
+                     } else if(element.attachEvent) {
+                         element.attachEvent('on' + type, handler);
+                     } else {
+                         element['on' + type] = handler;
+                     }
+                },
+                removeHandler: function(element, type, handler) {
+                    if(element.removeEventListener) {
+                        element.removeEventListener(type, handler, false);
+                    } else if(element.detachEvent) {
+                        element.detachEvent('on' + type, handler);
+                    } else {
+                        element['on' + type] = null;
+                    }
+                },
+                getEvent: function(event) {
+                    return event ? event : window.event;
+                },
+                getTarget: function(event) {
+                    return event.target || event.srcElement;
+                },
+                preventDefault: function(event) {
+                    if(event.preventDefault) {
+                        event.preventDefault();
+                    } else {
+                        event.returnValue =  false;
+                    }
+                },
+                stopPropagation: function(event) {
+                   if(event.stopPropagation) {
+                       event.stopPropagation();
+                   } else {
+                       event.cancelBubble = true;
+                   }
+                },
+                // 该属性只对 mouserover mouseout 事件才包含值，其他事件这个属性返回null
+                getRelatedTarget: function(event) {
+                    if(event.relatedTarget) {  //IE8及之前版本不支持该属性
+                        return event.relatedTarget;
+                    } else if(event.toElement) {  //mouseover事件触发时
+                        return event.toElement;
+                    } else if(event.fromElement) { //mouseout事件触发时
+                        return event.fromElement;
+                    } else {
+                        return null;
+                    }
+                },
+                //返回mousedown mouseup后的buttom属性
+                //DOM的 button 属性有3个值： 0 表示主鼠标按钮（鼠标左键）   1 表示中间鼠标按钮（滚轮按钮）
+                // 2 表示次鼠标按钮（鼠标右键）
+                getButton: function(event) {
+                    if(document.implementation.hasFeature('MouseEvents', '2.0')) {
+                        return event.button;
+                    } else { //IE8及以前版本
+                        switch(event.button) {
+                            case 0:
+                            case 1:
+                            case 3:
+                            case 5:
+                            case 7:
+                                return 0;
+                            case 2:
+                            case 6:
+                                return 2;
+                            case 4:
+                                return 1;
+                        }
+                    }
+                }
+             };
+
+
+             //ex:
+             var eventBtn1 = document.getElementById('eventBtn1');
+
+
+             // 绑定 eventBtn1 事件   mousedown mouseup 事件
+             EventUtil.addHandler(eventBtn1, 'mousedown', function(event) {
+                event = EventUtil.getEvent(event);
+                var mouseBtn = EventUtil.getButton(event),
+                    mouseBtnLabel = function(mouseBtn) {
+                        switch(mouseBtn) {
+                            case 0:
+                                return '左';
+                            case 1:
+                                return '中';
+                            case 2:
+                                return '右';
+                        }
+                    };
+                console.log('get Button ' + mouseBtnLabel(mouseBtn) + '键: '+ mouseBtn);
+
+             });
+
+
+
+       </script>
+</body>
+</html>

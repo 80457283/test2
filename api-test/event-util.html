@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>EventUtil</title>
+</head>
+<body>
+       <span id="eventBtn">eventBtn</span>
+       <span id="addEventBtn">点击添加eventBtn事件</span>
+       <span id="removeEventBtn">点击移除eventBtn事件</span>
+
+
+       <script type="text/javascript">
+             var EventUtil = {
+                addHandler: function(element, type, handler) {
+                     if(element.addEventListener) {
+                         element.addEventListener(type, handler, false);
+                     } else if(element.attachEvent) {
+                         element.attachEvent('on' + type, handler);
+                     } else {
+                         element['on' + type] = handler;
+                     }
+                },
+                removeHandler: function(element, type, handler) {
+                    if(element.removeEventListener) {
+                        element.removeEventListener(type, handler, false);
+                    } else if(element.detachEvent) {
+                        element.detachEvent('on' + type, handler);
+                    } else {
+                        element['on' + type] = null;
+                    }
+                },
+                getEvent: function(event) {
+                    return event ? event : window.event;
+                },
+                getTarget: function(event) {
+                    return event.target || event.srcElement;
+                },
+                preventDefault: function(event) {
+                    if(event.preventDefault) {
+                        event.preventDefault();
+                    } else {
+                        event.returnValue =  false;
+                    }
+                },
+                stopPropagation: function(event) {
+                   if(event.stopPropagation) {
+                       event.stopPropagation();
+                   } else {
+                       event.cancelBubble = true;
+                   }
+                }
+             };
+
+
+             //ex:
+             var eventBtn = document.getElementById('eventBtn'),
+                 addEventBtn = document.getElementById('addEventBtn'),
+                 removeEventBtn = document.getElementById('removeEventBtn');
+             var hanler_add = function() {
+                 console.log('addEventBtn Clicked!');
+             };
+
+             //绑定eventBtn click事件
+             var bindAdd = function() {
+                 EventUtil.addHandler(eventBtn, 'click', hanler_add);
+             };
+             //取消eventBtn click事件
+             var bindRemove = function() {
+                 EventUtil.removeHandler(eventBtn, 'click', hanler_add);
+             };
+
+             // 绑定 addEventBtn   、 removeEventBtn 事件
+             EventUtil.addHandler(addEventBtn, 'click', bindAdd);
+             EventUtil.addHandler(removeEventBtn, 'click', bindRemove);
+
+
+       </script>
+</body>
+</html>
